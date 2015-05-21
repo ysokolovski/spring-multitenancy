@@ -58,7 +58,7 @@ public class DataBootstrap {
             domainRepository.save(adminDomain);
             domainRepository.save(userDomain);
 
-            admin = userService.createUser("admin", "admin", "admin", "", "", "en", role_admin, adminDomain);
+            admin = userService.createUser("admin", "admin", "admin", "Administrator", "", "en", role_admin, adminDomain);
             admin.getAuthorities().add(role_user);
             userRepository.save(admin);
 

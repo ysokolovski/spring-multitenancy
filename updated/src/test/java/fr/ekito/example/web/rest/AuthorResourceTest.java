@@ -1,5 +1,7 @@
 package fr.ekito.example.web.rest;
 
+import fr.ekito.example.domain.Domain;
+import fr.ekito.example.repository.DomainRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,6 +18,7 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import org.joda.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 import fr.ekito.example.Application;
 import fr.ekito.example.domain.Author;
@@ -37,13 +40,16 @@ public class AuthorResourceTest {
 
     private static final String DEFAULT_NAME = "SAMPLE_TEXT";
     private static final String UPDATED_NAME = "UPDATED_TEXT";
-    
+
     private static final LocalDate DEFAULT_BIRTH_DATE = new LocalDate(0L);
     private static final LocalDate UPDATED_BIRTH_DATE = new LocalDate();
-    
+
 
     @Inject
     private AuthorRepository authorRepository;
+
+    @Inject
+    private DomainRepository domainRepository;
 
     private MockMvc restAuthorMockMvc;
 
@@ -63,6 +69,10 @@ public class AuthorResourceTest {
         author = new Author();
         author.setName(DEFAULT_NAME);
         author.setBirthDate(DEFAULT_BIRTH_DATE);
+
+        Domain domain = domainRepository.findAll().iterator().next();
+
+        author.setUserDomain(domain);
     }
 
     @Test
@@ -134,6 +144,7 @@ public class AuthorResourceTest {
                 .andExpect(status().isOk());
 
         // Validate the Author in the database
+
         List<Author> authors = authorRepository.findAll();
         assertThat(authors).hasSize(1);
         Author testAuthor = authors.iterator().next();

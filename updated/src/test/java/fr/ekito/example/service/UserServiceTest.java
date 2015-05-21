@@ -5,6 +5,7 @@ import fr.ekito.example.MultitenantMongoTemplate;
 import fr.ekito.example.config.MongoConfiguration;
 import fr.ekito.example.domain.Domain;
 import fr.ekito.example.domain.User;
+import fr.ekito.example.repository.DomainRepository;
 import fr.ekito.example.repository.UserRepository;
 import fr.ekito.example.security.DomainProvider;
 import org.joda.time.DateTime;
@@ -51,6 +52,9 @@ public class UserServiceTest {
     @Inject
     MultitenantMongoTemplate multitenantMongoTemplate;
 
+    @Inject
+    private DomainRepository domainRepository;
+
     @Mock
     private DomainProvider domainProvider;
 
@@ -62,8 +66,7 @@ public class UserServiceTest {
     @Test
     public void testFindNotActivatedUsersByCreationDateBefore() {
 
-        final Domain test = new Domain("TEST");
-        test.setId(UUID.randomUUID().toString());
+        final Domain test = domainRepository.findAll().get(0);
         when(domainProvider.getCurrentDomain()).thenReturn(Optional.of(test));
 
         multitenantMongoTemplate.setDomainProvider(domainProvider);

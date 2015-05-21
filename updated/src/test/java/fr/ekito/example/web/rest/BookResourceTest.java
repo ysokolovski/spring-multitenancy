@@ -1,5 +1,6 @@
 package fr.ekito.example.web.rest;
 
+import fr.ekito.example.repository.DomainRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,19 +39,22 @@ public class BookResourceTest {
 
     private static final String DEFAULT_TITLE = "SAMPLE_TEXT";
     private static final String UPDATED_TITLE = "UPDATED_TEXT";
-    
+
     private static final String DEFAULT_DESCRIPTION = "SAMPLE_TEXT";
     private static final String UPDATED_DESCRIPTION = "UPDATED_TEXT";
-    
+
     private static final LocalDate DEFAULT_PUBLICATION_DATE = new LocalDate(0L);
     private static final LocalDate UPDATED_PUBLICATION_DATE = new LocalDate();
-    
+
     private static final BigDecimal DEFAULT_PRICE = BigDecimal.ZERO;
     private static final BigDecimal UPDATED_PRICE = BigDecimal.ONE;
-    
+
 
     @Inject
     private BookRepository bookRepository;
+
+    @Inject
+    private DomainRepository domainRepository;
 
     private MockMvc restBookMockMvc;
 
@@ -72,6 +76,7 @@ public class BookResourceTest {
         book.setDescription(DEFAULT_DESCRIPTION);
         book.setPublicationDate(DEFAULT_PUBLICATION_DATE);
         book.setPrice(DEFAULT_PRICE);
+        book.setUserDomain(domainRepository.findAll().iterator().next());
     }
 
     @Test
