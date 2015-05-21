@@ -2,10 +2,10 @@ package fr.ekito.example;
 
 import fr.ekito.example.domain.Domain;
 import fr.ekito.example.domain.MultitenantEntity;
-import fr.ekito.example.exception.NoDomainForRequestException;
-import fr.ekito.example.security.SecurityUtils;
+import fr.ekito.example.security.DomainProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.MongoDbFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
@@ -43,20 +43,24 @@ public class MultitenantMongoTemplate extends MongoTemplate {
         return super.find(query, entityClass, collectionName);
     }
 
+    @Autowired
+    DomainProvider domainProvider;
+
     private void injectCriteria(Query query) {
-        Optional<Domain> currentDomain = SecurityUtils.getCurrentDomain();
+        Optional<Domain> currentDomain = domainProvider.getCurrentDomain();
         // check already existing present group criteria
         boolean criteriaAlreadyExists = query.getQueryObject().containsField("userDomain");
 
         //need inject criteria
         if (!criteriaAlreadyExists) {
-            Domain domain = currentDomain.get();
             if (currentDomain.isPresent()) {
+                Domain domain = currentDomain.get();
                 query.addCriteria(where("userDomain").is(domain));
                 log.info("inject domain {} in query {}", domain, query);
             } else {
                 // no domain found
-                throw new NoDomainForRequestException();
+                log.warn("current domain is empty");
+                //throw new NoDomainForRequestException();
             }
         } else {
             log.warn("current domain is empty");
@@ -69,4 +73,7 @@ public class MultitenantMongoTemplate extends MongoTemplate {
         return res;
     }
 
+    public void setDomainProvider(DomainProvider domainProvider) {
+        this.domainProvider = domainProvider;
+    }
 }

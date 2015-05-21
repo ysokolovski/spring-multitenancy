@@ -10,6 +10,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -17,7 +18,8 @@ import java.util.Optional;
 /**
  * Utility class for Spring Security.
  */
-public final class SecurityUtils {
+@Component
+public class SecurityUtils implements DomainProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(SecurityUtils.class);
 
@@ -49,7 +51,7 @@ public final class SecurityUtils {
         return userName;
     }
 
-    public static Optional<Domain> getCurrentDomain() {
+    public Optional<Domain> getCurrentDomain() {
         Domain domain = null;
         //retrieves the current user's login from the security context
         String currentLogin = getCurrentLogin();
@@ -62,7 +64,10 @@ public final class SecurityUtils {
                 logger.warn("couldn't get user domain - userRepository is null");
             }
         }
-        return Optional.of(domain);
+        if(domain==null)
+            return Optional.empty();
+        else
+            return Optional.of(domain);
     }
 
     /**
